@@ -2,6 +2,8 @@ package br.com.kaiky.todo_list.service;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.kaiky.todo_list.dto.TaskRequestDTO;
@@ -29,6 +31,12 @@ public class TaskService {
         Task saveTask = taskRepository.save(task);
 
         return convertToResponseDTO(saveTask);
+    }
+
+    public Page<TaskResponseDTO> getAllTasks(Pageable pageable) {
+        Page<Task> tasks = taskRepository.findAll(pageable);
+
+        return tasks.map(this::convertToResponseDTO);
     }
     
     public void deleteTaskById(UUID id) {

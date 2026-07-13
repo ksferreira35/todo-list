@@ -2,9 +2,12 @@ package br.com.kaiky.todo_list.controller;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,8 +17,6 @@ import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
 import br.com.kaiky.todo_list.service.TaskService;
 
-
-
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -24,6 +25,13 @@ public class TaskController {
 
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TaskResponseDTO>> getAllTasks(
+        Pageable pageable
+    ) {
+        return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
     @PostMapping
