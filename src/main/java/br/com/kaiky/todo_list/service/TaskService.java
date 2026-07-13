@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
+import br.com.kaiky.todo_list.dto.TaskStatusDTO;
 import br.com.kaiky.todo_list.entity.Task;
 import br.com.kaiky.todo_list.exception.ResourceNotFoundException;
 import br.com.kaiky.todo_list.repository.TaskRepository;
@@ -44,6 +45,15 @@ public class TaskService {
                                   .orElseThrow(() -> new ResourceNotFoundException("Task não encontrada"));
         
         return convertToResponseDTO(task);
+    }
+
+    public void updateTaskStatus(UUID id, TaskStatusDTO dto) {
+        Task task = taskRepository.findById(id)
+                                  .orElseThrow(() -> new ResourceNotFoundException("Task não encontrada"));
+        
+        task.setCompleted(dto.completed());
+        
+        taskRepository.save(task);
     }
     
     public void deleteTaskById(UUID id) {
