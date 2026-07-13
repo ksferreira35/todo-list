@@ -17,6 +17,7 @@ import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
 import br.com.kaiky.todo_list.service.TaskService;
 
+
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -33,6 +34,14 @@ public class TaskController {
     ) {
         return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResponseDTO> findTaskById(
+        @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(taskService.findTaskById(id));
+    }
+    
 
     @PostMapping
     public ResponseEntity<TaskResponseDTO> createTask(

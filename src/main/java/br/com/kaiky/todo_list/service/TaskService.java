@@ -38,6 +38,13 @@ public class TaskService {
 
         return tasks.map(this::convertToResponseDTO);
     }
+
+    public TaskResponseDTO findTaskById(UUID id) {
+        Task task = taskRepository.findById(id)
+                                  .orElseThrow(() -> new ResourceNotFoundException("Task não encontrada"));
+        
+        return convertToResponseDTO(task);
+    }
     
     public void deleteTaskById(UUID id) {
         Task task = taskRepository.findById(id)
