@@ -42,14 +42,14 @@ public class TaskService {
 
     public TaskResponseDTO findTaskById(UUID id) {
         Task task = taskRepository.findById(id)
-                                  .orElseThrow(() -> new ResourceNotFoundException("Task não encontrada"));
+                                  .orElseThrow(() -> new ResourceNotFoundException("Task with id: "+ id + "Not Found"));
         
         return convertToResponseDTO(task);
     }
 
     public void updateTaskStatus(UUID id, TaskStatusDTO dto) {
         Task task = taskRepository.findById(id)
-                                  .orElseThrow(() -> new ResourceNotFoundException("Task não encontrada"));
+                                  .orElseThrow(() -> new ResourceNotFoundException("Task with id: "+ id + "Not Found"));
         
         task.setCompleted(dto.completed());
         
@@ -67,7 +67,8 @@ public class TaskService {
         return new TaskResponseDTO(
             task.getId(),
             task.getTitle(),
-            task.getDescription(), false
+            task.getDescription(),
+            task.isCompleted()
         );
 
     }

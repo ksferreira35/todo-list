@@ -2,8 +2,11 @@ package br.com.kaiky.todo_list.controller;
 
 import java.util.UUID;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +22,9 @@ import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
 import br.com.kaiky.todo_list.dto.TaskStatusDTO;
 import br.com.kaiky.todo_list.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 
 @RestController
@@ -33,11 +39,22 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<Page<TaskResponseDTO>> getAllTasks(
-        Pageable pageable
+        @ParameterObject
+        @PageableDefault(
+            size = 10, 
+            sort = "title",
+            direction = Sort.Direction.ASC
+            ) Pageable pageable
     ) {
         return ResponseEntity.ok(taskService.getAllTasks(pageable));
     }
 
+    @Operation(summary = "Get a task by ID")
+    @ApiResponses
+    ({
+            @ApiResponse(responseCode = "200", description = "Task Found"),
+            @ApiResponse(responseCode = "404", description = "Task Not Found")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> findTaskById(
         @PathVariable UUID id
@@ -48,7 +65,7 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<TaskResponseDTO> createTask(
-        TaskRequestDTO dto) {
+        @RequestBody TaskRequestDTO dto) {
 
         return ResponseEntity
         .status(HttpStatus.CREATED)
