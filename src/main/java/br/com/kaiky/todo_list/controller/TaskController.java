@@ -37,6 +37,7 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    @Operation(summary = "List all tasks (Paginated)")
     @GetMapping
     public ResponseEntity<Page<TaskResponseDTO>> getAllTasks(
         @ParameterObject
@@ -62,7 +63,7 @@ public class TaskController {
         return ResponseEntity.ok(taskService.findTaskById(id));
     }
     
-
+    @Operation(summary = "Create a task")
     @PostMapping
     public ResponseEntity<TaskResponseDTO> createTask(
         @RequestBody TaskRequestDTO dto) {
@@ -72,6 +73,7 @@ public class TaskController {
         .body(taskService.createTask(dto));
     }
 
+    @Operation(summary = "Update a task status")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateTaskStatus (
         @PathVariable UUID id,
@@ -82,6 +84,7 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Delete a task by ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTaskById(
         @PathVariable UUID id
