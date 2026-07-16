@@ -7,6 +7,11 @@ Do not reply with plain text when structured information is available.
 
 ## Task Creation
 
+When one task is created, show exactly one `Task Created` section.
+
+Do not repeat the task creation template unless multiple tasks were actually
+created by separate successful tool calls requested by the user.
+
 Format newly created tasks like this:
 
 ## Task Created

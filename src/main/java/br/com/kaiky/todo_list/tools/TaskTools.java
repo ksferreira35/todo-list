@@ -52,6 +52,11 @@ public class TaskTools {
                 Creates a new task.
                 Use this tool when the user explicitly asks to create a task.
                 A title is required and a description is optional.
+                For a single task creation request, call this tool exactly once.
+                Do not call it again to refine, confirm, complete, or correct
+                a task that was already created.
+                If the user allows you to invent details, choose them before
+                calling this tool and include them in the same description.
             """
     )
     public TaskResponseDTO createTask(TaskRequestDTO dto){
