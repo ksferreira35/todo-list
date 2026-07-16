@@ -30,9 +30,9 @@ services:
     ports:
       - 8080:8080
     environment:
-      DB_HOST: database
-      DB_PORT: 5432
-      DB_NAME: todo-list
+      DB_HOST: ${DB_HOST:-database}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-todo-list}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
