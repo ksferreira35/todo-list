@@ -1,19 +1,16 @@
 package br.com.kaiky.todo_list.tools;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+
 import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
 import br.com.kaiky.todo_list.dto.TaskStatusDTO;
 import br.com.kaiky.todo_list.service.TaskService;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.UUID;
 
 @Component
 public class TaskTools {
