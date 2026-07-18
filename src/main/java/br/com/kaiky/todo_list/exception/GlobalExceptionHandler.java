@@ -1,15 +1,11 @@
 package br.com.kaiky.todo_list.exception;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.openai.errors.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,9 +13,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.openai.errors.BadRequestException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -84,10 +82,28 @@ public class GlobalExceptionHandler {
     ) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.BAD_REQUEST,
-                "IThe request body is invalid or malformed."
+                "The request body is invalid or malformed."
         );
 
         problem.setTitle("Invalid request body");
+        problem.setInstance(URI.create(request.getRequestURI()));
+
+        return problem;
+    }
+
+    // 400 - Prompt Injection
+    @ExceptionHandler(PromptInjectionException.class)
+    public ProblemDetail handlePromptInjection(
+            PromptInjectionException exception,
+            HttpServletRequest request
+
+    ) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "The request was blocked because it contained potentially unsafe instructions.\n"
+        );
+
+        problem.setTitle("Unsafe instructions");
         problem.setInstance(URI.create(request.getRequestURI()));
 
         return problem;

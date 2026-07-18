@@ -1,19 +1,16 @@
 package br.com.kaiky.todo_list.tools;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
+
 import br.com.kaiky.todo_list.dto.TaskRequestDTO;
 import br.com.kaiky.todo_list.dto.TaskResponseDTO;
 import br.com.kaiky.todo_list.dto.TaskStatusDTO;
 import br.com.kaiky.todo_list.service.TaskService;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.UUID;
 
 @Component
 public class TaskTools {
@@ -55,6 +52,11 @@ public class TaskTools {
                 Creates a new task.
                 Use this tool when the user explicitly asks to create a task.
                 A title is required and a description is optional.
+                For a single task creation request, call this tool exactly once.
+                Do not call it again to refine, confirm, complete, or correct
+                a task that was already created.
+                If the user allows you to invent details, choose them before
+                calling this tool and include them in the same description.
             """
     )
     public TaskResponseDTO createTask(TaskRequestDTO dto){

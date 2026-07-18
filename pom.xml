@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>br.com.kaiky</groupId>
 	<artifactId>todo-list</artifactId>
-	<version>1.0.0</version>
+	<version>1.2.0</version>
 
 	<name>Todo List API</name>
 	<description>REST API for task management built with Spring Boot.</description>
@@ -99,6 +99,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
         </dependency>
 	</dependencies>
 

@@ -1,69 +1,80 @@
 package br.com.kaiky.todo_list.service;
 
-import br.com.kaiky.todo_list.dto.AiChatResponseDTO;
-import br.com.kaiky.todo_list.tools.TaskTools;
+import java.util.UUID;
+
+import br.com.kaiky.todo_list.prompt.PromptInjectionAdvisor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import br.com.kaiky.todo_list.dto.AiChatRequestDTO;
+import br.com.kaiky.todo_list.dto.AiChatResponseDTO;
+import br.com.kaiky.todo_list.prompt.PromptService;
+import br.com.kaiky.todo_list.repository.RedisChatMemoryRepository;
+import br.com.kaiky.todo_list.tools.TaskTools;
 
 @Service
 public class AiService {
+
     private final ChatClient chatClient;
     private final TaskTools taskTools;
+    private final PromptService promptService;
+    private final ChatHistoryService chatHistoryService;
+    private final UUID defaultConversationId;
 
     public AiService(
             ChatClient.Builder chatClientBuilder,
-            TaskTools taskTools
+            TaskTools taskTools,
+            PromptService promptService,
+            PromptInjectionAdvisor promptInjectionAdvisor,
+            RedisChatMemoryRepository redisChatMemoryRepository,
+            ChatHistoryService chatHistoryService,
+            @Value("${app.chat.default-conversation-id}") String defaultConversationId
     ) {
-        this.chatClient = chatClientBuilder.build();
+        ChatMemory chatMemory = MessageWindowChatMemory.builder()
+                .chatMemoryRepository(redisChatMemoryRepository)
+                .maxMessages(20)
+                .build();
+
+        this.chatClient = chatClientBuilder
+                .defaultAdvisors(
+                        promptInjectionAdvisor,
+                        MessageChatMemoryAdvisor.builder(chatMemory).build()
+                )
+                .build();
+
         this.taskTools = taskTools;
+        this.promptService = promptService;
+        this.chatHistoryService = chatHistoryService;
+        this.defaultConversationId = UUID.fromString(defaultConversationId);
+
     }
 
     public AiChatResponseDTO chat(AiChatRequestDTO dto) {
-        String response = chatClient
-                            .prompt()
-                            .system("""
-                                Your name is Liyz.
-                            
-                                You are a task management assistant.
-                            
-                                Answer normal conversational questions directly without calling tools.
-                            
-                                Only call a tool when the user explicitly asks to:
-                                - list tasks
-                                - retrieve a specific task
-                                - create a task
-                                - update a task completion status
-                                - delete a task
-                            
-                                Do not call tools for:
-                                - greetings
-                                - questions about your name
-                                - general conversation
-                                - questions about your capabilities
-                                - requests unrelated to task management
-                            
-                                Never claim that an operation succeeded unless the corresponding
-                                tool was executed successfully.
-                            
-                                Ask for any missing required information before calling a tool.
-                            
-                                Never invent task IDs.
-                                Never use placeholder task IDs such as "unknown", "null",
-                                "missing", or "not provided".
-                            
-                                Only retrieve, update, or delete a specific task when the user
-                                provides a valid task UUID.
-                            
-                                For destructive operations, require a clear and explicit request
-                                from the user.
-                                """)
-                            .user(dto.message())
-                            .tools(taskTools)
-                            .call()
-                            .content();
+        UUID conversationId = dto.conversationId() != null
+                ? dto.conversationId()
+                : defaultConversationId;
 
-        return new AiChatResponseDTO(response);
+        String response = chatClient
+                .prompt()
+                .system(promptService.getSystemPrompt())
+                .user(dto.message())
+                .advisors(advisor -> advisor.param(
+                        ChatMemory.CONVERSATION_ID,
+                        conversationId.toString()
+                ))
+                .tools(taskTools)
+                .call()
+                .content();
+        String assistantResponse = response == null ? "" : response;
+
+        chatHistoryService.getOrCreateConversation(conversationId, dto.message());
+        chatHistoryService.saveUserMessage(conversationId, dto.message());
+        chatHistoryService.saveAssistantMessage(conversationId, assistantResponse);
+
+        return new AiChatResponseDTO(conversationId, assistantResponse);
     }
 }
