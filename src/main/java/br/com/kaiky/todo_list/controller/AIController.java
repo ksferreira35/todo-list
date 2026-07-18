@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/ai")
 @CrossOrigin(origins = {
         "http://127.0.0.1:3000",
-        "http://localhost:3000"
+        "http://localhost:3030"
 })
 public class AIController {
     private final AiService aiService;

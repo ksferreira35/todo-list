@@ -16,7 +16,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info()
                 .title("Todo List API")
-                .version("v1.0.0")
+                .version("v1.2.0")
                 .description("REST API for task management built with Spring Boot.")
                 .license(new License()
                         .name("MIT License")
